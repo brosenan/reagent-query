@@ -44,11 +44,11 @@
   :main ^:skip-aot reagent-query.core
   :target-path "target/%s"
   
-  :publish {:site "reagent-query"
+  :publish {:template {:site "reagent-query"
+                       :output "docs"
+                       :author "Boaz Rosenan"
+                       :url "https://github.com/brosenan/reagent-query"}
             :theme "bolton" ;; stark is the default
-            :output "docs"
-            :author "Boaz Rosenan"
-            :repository "https://github.com/brosenan/reagent-query"
             :files {"core"
                     {:input "test/reagent_query/core_test.cljs"
                      :title "reagent-query"
