@@ -47,7 +47,11 @@
   :publish {:site "reagent-query"
             :theme "bolton" ;; stark is the default
             :output "docs"
+            :author "Boaz Rosenan"
+            :repository "https://github.com/brosenan/reagent-query"
             :files {"core"
                     {:input "test/reagent_query/core_test.cljs"
                      :title "reagent-query"
                      :subtitle "Test helpers for reagent code"}}})
+
+;; echo "(use 'lucid-publish) (copy-assets) (publish-all)" | lein repl

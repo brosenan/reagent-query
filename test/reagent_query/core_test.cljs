@@ -1,7 +1,7 @@
 (ns reagent-query.core-test
   (:require [cljs.test :refer-macros [is testing]]
             [devcards.core :refer-macros [deftest]]
-            [reagent-query.core :as hq])
+            [reagent-query.core :as rq])
   (:require-macros [reagent-query.tests :refer [fact]]))
 
 [[:chapter {:title "Introduction"}]]
@@ -62,52 +62,52 @@ The component creates a `:ul` with a `:li` for each task, with an `:input` box c
       ;; Empty list
       (let [state (atom [])]
         (is (= (-> (todo state)
-                   (hq/query :ul :li))
+                   (rq/query :ul :li))
                [])))
 
       ;; The :id field should be the :li's :key attribute
       (let [state (atom [{:id 1 :todo "One"}
                          {:id 2 :todo "Two"}])]
         (is (= (-> (todo state)
-                   (hq/query :ul :li:key))
+                   (rq/query :ul :li:key))
                [1 2])))
 
       ;; Each element includes an :input box with the :todo value as :value
       (let [state (atom [{:id 1 :todo "One"}
                          {:id 2 :todo "Two"}])]
         (is (= (-> (todo state)
-                   (hq/query :ul :li :input:value))
+                   (rq/query :ul :li :input:value))
                ["One" "Two"])))
 
       ;; Each :li element has a :button with "Done" as text
       (let [state (atom [{:id 1 :todo "One"}
                          {:id 2 :todo "Two"}])]
         (is (= (-> (todo state)
-                   (hq/query :ul :li :button))
+                   (rq/query :ul :li :button))
                ["Done" "Done"])))
 
       ;; The :on-click callback associated with each button deletes the respective entry in the atom
       (let [state (atom [{:id 1 :todo "One"}
                          {:id 2 :todo "Two"}])
             callbacks (-> (todo state)
-                          (hq/query :ul :li :button:on-click))]
+                          (rq/query :ul :li :button:on-click))]
         ;; Let's call the second callback
         ((second callbacks))
         ;; Now we should only have "One"
         (is (= (-> (todo state)
-                   (hq/query :ul :li :input:value))
+                   (rq/query :ul :li :input:value))
                ["One"])))
 
       ;; The :on-change callback of the :input box update the :todo of that entry
       (let [state (atom [{:id 1 :todo "One"}
                          {:id 2 :todo "Two"}])
             callbacks (-> (todo state)
-                          (hq/query :ul :li :input:on-change))]
+                          (rq/query :ul :li :input:on-change))]
         ;; Let's call the first callback with a mock event modifying the value to "Three"
-        ((first callbacks) (hq/mock-change-event "Three"))
+        ((first callbacks) (rq/mock-change-event "Three"))
         ;; Now we should have "Three" instead of "One"
         (is (= (-> (todo state)
-                   (hq/query :ul :li :input:value))
+                   (rq/query :ul :li :input:value))
                ["Three" "Two"]))))
 
 [[:chapter {:title "query"}]]
@@ -119,37 +119,37 @@ Our `query` function is intended to do the same, based on a given hiccup-like ve
 
 "When given no extra arguments, `query` returns a single result: the given vector."
 (fact q1
-      (is (= (hq/query [:div "foo" "bar"]) [[:div "foo" "bar"]])))
+      (is (= (rq/query [:div "foo" "bar"]) [[:div "foo" "bar"]])))
 
 "When given an extra keyword argument matching the element type (the first element in the vector), the child elements are returned."
 (fact q2
-      (is (= (hq/query [:div "foo" "bar"] :div) ["foo" "bar"])))
+      (is (= (rq/query [:div "foo" "bar"] :div) ["foo" "bar"])))
 
 "If the extra parameter does not match the element type, an empty sequence is returned."
 (fact q3
-      (is (= (hq/query [:div "foo" "bar"] :p) [])))
+      (is (= (rq/query [:div "foo" "bar"] :p) [])))
 
 "According to hiccup's convention, if the vector's second element is a map, it represents _attributes_ for the element.
 If the extra argument is a keyword of the form `:elem:attr`, and if the `:elem` part matches the element,
 the value of the attribute `:attr` is returned."
 (fact q4
-      (is (= (hq/query [:div {:id "x"} "foo" "bar"] :div:id) ["x"])))
+      (is (= (rq/query [:div {:id "x"} "foo" "bar"] :div:id) ["x"])))
 
 "If the second part of the keyword does not match an attribute, `nil` is added to the sequence."
 (fact q5
-      (is (= (hq/query [:div {:id "x"} "foo" "bar"] :div:not-an-attr) [nil])))
+      (is (= (rq/query [:div {:id "x"} "foo" "bar"] :div:not-an-attr) [nil])))
 
 "If the first part of the keyword does not match the element, an empty sequence is returned."
 (fact q6
-      (is (= (hq/query [:div {:id "x"} "foo" "bar"] :p:id) [])))
+      (is (= (rq/query [:div {:id "x"} "foo" "bar"] :p:id) [])))
 
 "The attribute map is ignored when returning the contents of an element."
 (fact q7
-      (is (= (hq/query [:div {:id "x"} "foo" "bar"] :div) ["foo" "bar"])))
+      (is (= (rq/query [:div {:id "x"} "foo" "bar"] :div) ["foo" "bar"])))
 
 "If an element is a sequence (e.g., created with a `for`), we operate on all its elements and concatenate the results."
 (fact q8
-      (is (= (hq/query [:ul
+      (is (= (rq/query [:ul
                         [:li {:key -1}]
                         (for [i (range 3)]
                           [:li {:key i}])] :ul :li:key) [-1 0 1 2])))
@@ -159,7 +159,7 @@ the value of the attribute `:attr` is returned."
 For example, if we have a `:ul` element containing multiple `:li` elements, each containing a `:p` element and some text,
 The path `:ul :li :p` will return a sequence of the strings."
 (fact q-agg1
-      (is (= (hq/query [:ul
+      (is (= (rq/query [:ul
                         [:li [:p "One"]]
                         [:li [:p "Two"]]
                         [:li [:p "Three"]]] :ul :li :p) ["One" "Two" "Three"])))
@@ -169,7 +169,7 @@ The path `:ul :li :p` will return a sequence of the strings."
 This means that it is expected to match against elements that have a `:class` attribute that includes the given class name.
 For example, in the following example only \"Two\" has the class `selected`, hence it is the only one to be returned."
 (fact q-cls1
-      (is (= (hq/query [:ul
+      (is (= (rq/query [:ul
                         [:li {:class "other"} [:p "One"]]
                         [:li {:class "other selected"} [:p "Two"]]
                         [:li [:p "Three"]]] :ul :.selected :p) ["Two"])))
@@ -177,7 +177,7 @@ For example, in the following example only \"Two\" has the class `selected`, hen
 "The keyword can match at the same time against an element type and any number of classes.
 For example, the keyword `:li.foo.bar` matches against `:li` elements that have both the `foo` and the `bar` classes."
 (fact q-cls2
-      (is (= (hq/query [:ul
+      (is (= (rq/query [:ul
                         [:li {:class "foo"} [:p "One"]]
                         [:li {:class "bar"} [:p "Two"]]
                         [:li {:class "bar foo"} [:p "Three"]]] :ul :li.foo.bar :p) ["Three"])))
@@ -187,5 +187,5 @@ For example, the keyword `:li.foo.bar` matches against `:li` elements that have 
 The function takes as parameter a new value, and generates a Javascript object that has a single member: `target`,
 which by itself is a Javascript object with one field: `value`, containing the given value."
 (fact mce1
-      (let [ev (hq/mock-change-event "val")]
+      (let [ev (rq/mock-change-event "val")]
         (is (= (.-target.value ev) "val"))))
