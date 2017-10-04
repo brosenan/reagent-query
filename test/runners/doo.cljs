@@ -2,4 +2,4 @@
   (:require [doo.runner :refer-macros [doo-all-tests]]
                                       [runners.tests]))
 
-(doo-all-tests #"(hiccup-query)\..*-test")
+(doo-all-tests #"(reagent-query)\..*-test")

@@ -1,4 +1,4 @@
-(defproject hiccup-query "0.1.0-SNAPSHOT"
+(defproject reagent-query "0.1.0-SNAPSHOT"
   :description "FIXME: write description"
   :url "http://example.com/FIXME"
   :license {:name "Eclipse Public License"
@@ -21,7 +21,7 @@
               :builds [{:id "dev"             ; development configuration
                         :source-paths ["src"] ; Paths to monitor for build
                         :figwheel true        ; Enable Figwheel
-                        :compiler {:main hiccup-query.core     ; your main namespace
+                        :compiler {:main reagent-query.core     ; your main namespace
                                    :asset-path "cljs/out"                       ; Where load-dependent files will go, mind you this one is relative
                                    :output-to "resources/public/cljs/main.js"   ; Where the main file will be built
                                    :output-dir "resources/public/cljs/out"      ; Directory for temporary files
@@ -41,13 +41,13 @@
                                    :output-dir "resources/public/cljs/tests/out"
                                    :output-to "resources/public/cljs/tests/all-tests.js"
                                    :source-map-timestamp true}}]}
-  :main ^:skip-aot hiccup-query.core
+  :main ^:skip-aot reagent-query.core
   :target-path "target/%s"
   
-  :publish {:site   "hiccup-query"
+  :publish {:site   "reagent-query"
             :theme  "bolton" ;; stark is the default
             :output "doc"
             :files {"core"
-                    {:input "test/hiccup_query/core_test.cljs"
+                    {:input "test/reagent_query/core_test.cljs"
                      :title "Core Functionality"
                      :subtitle "Querying hiccup vectors"}}})

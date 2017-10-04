@@ -1,4 +1,4 @@
-(ns hiccup-query.core
+(ns reagent-query.core
   (:require [clojure.string :as str]))
 
 (defn elem-and-class-matches [kw elem cls]

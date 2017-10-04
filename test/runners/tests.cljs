@@ -1,2 +1,2 @@
 (ns runners.tests
-  (:require [hiccup-query.core-test]))
+  (:require [reagent-query.core-test]))

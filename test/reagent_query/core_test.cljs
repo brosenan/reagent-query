@@ -1,8 +1,8 @@
-(ns hiccup-query.core-test
+(ns reagent-query.core-test
   (:require [cljs.test :refer-macros [is testing]]
             [devcards.core :refer-macros [deftest]]
-            [hiccup-query.core :as hq])
-  (:require-macros [hiccup-query.tests :refer [fact]]))
+            [reagent-query.core :as hq])
+  (:require-macros [reagent-query.tests :refer [fact]]))
 
 [[:chapter {:title "Introduction"}]]
 "[Reagent](http://reagent-project.github.io) is a ClojureScript library that wraps [React](https://reactjs.org), and makes it even more awesome by leveraging the power of
@@ -35,7 +35,7 @@ We can set values to atoms, call a function extract data and assert its value.
 We can extract event handlers and call them to see how they change the state, etc."
 
 [[:section {:title "Example"}]]
-"In the following example we will show a piece of Reagent code and the associated tests, based on `hiccup-query`."
+"In the following example we will show a piece of Reagent code and the associated tests, based on `reagent-query`."
 
 "The following component function takes as parameter an atom containing its state.
 The state consists of a sequence of \"todo\" tasks, given as maps, each containing a unique `:id` and a `:todo` string.
