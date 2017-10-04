@@ -8,7 +8,7 @@
   <!-- Enable responsiveness on mobile devices-->
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1">
   <link rel="shortcut icon" href="favicon.ico">
-  <title>bolton.Core Functionality - Test helpers for reagent code</title>
+  <title>bolton.reagent-query - Test helpers for reagent code</title>
   <script src="js/highlight.min.js"></script>
   <script src="js/gumshoe.min.js"></script>
   <script src="js/smooth-scroll.min.js"></script>
@@ -37,7 +37,7 @@
     <span>&nbsp;</span>
     <a class="sidebar-nav-item header" href="index.html"><img src="img/logo-white.png"/></a>
     <span>&nbsp;</span>
-    <a class="sidebar-nav-item active" href="core.html">Core Functionality</a>
+    <a class="sidebar-nav-item active" href="core.html">reagent-query</a>
     <span class="sidebar-nav-item">&nbsp;</span>
     <span class="sidebar-nav-item">&nbsp;</span>
   </nav>
@@ -50,7 +50,7 @@
       <div class="masthead">
         <div class="container">
           <h3 class="masthead-title">
-            <span>bolton.Core Functionality</span>
+            <span>reagent-query</span>
             <small>Test helpers for reagent code</small>
           </h3>
         </div>
@@ -101,77 +101,77 @@
     ;; Empty list
     (let [state (atom [])]
       (is (= (-&gt; (todo state)
-                 (hq/query :ul :li))
+                 (rq/query :ul :li))
              [])))
 
     ;; The :id field should be the :li's :key attribute
     (let [state (atom [{:id 1 :todo &quot;One&quot;}
                        {:id 2 :todo &quot;Two&quot;}])]
       (is (= (-&gt; (todo state)
-                 (hq/query :ul :li:key))
+                 (rq/query :ul :li:key))
              [1 2])))
 
     ;; Each element includes an :input box with the :todo value as :value
     (let [state (atom [{:id 1 :todo &quot;One&quot;}
                        {:id 2 :todo &quot;Two&quot;}])]
       (is (= (-&gt; (todo state)
-                 (hq/query :ul :li :input:value))
+                 (rq/query :ul :li :input:value))
              [&quot;One&quot; &quot;Two&quot;])))
 
     ;; Each :li element has a :button with &quot;Done&quot; as text
     (let [state (atom [{:id 1 :todo &quot;One&quot;}
                        {:id 2 :todo &quot;Two&quot;}])]
       (is (= (-&gt; (todo state)
-                 (hq/query :ul :li :button))
+                 (rq/query :ul :li :button))
              [&quot;Done&quot; &quot;Done&quot;])))
 
     ;; The :on-click callback associated with each button deletes the respective entry in the atom
     (let [state (atom [{:id 1 :todo &quot;One&quot;}
                        {:id 2 :todo &quot;Two&quot;}])
           callbacks (-&gt; (todo state)
-                        (hq/query :ul :li :button:on-click))]
+                        (rq/query :ul :li :button:on-click))]
       ;; Let's call the second callback
       ((second callbacks))
       ;; Now we should only have &quot;One&quot;
       (is (= (-&gt; (todo state)
-                 (hq/query :ul :li :input:value))
+                 (rq/query :ul :li :input:value))
              [&quot;One&quot;])))
 
     ;; The :on-change callback of the :input box update the :todo of that entry
     (let [state (atom [{:id 1 :todo &quot;One&quot;}
                        {:id 2 :todo &quot;Two&quot;}])
           callbacks (-&gt; (todo state)
-                        (hq/query :ul :li :input:on-change))]
+                        (rq/query :ul :li :input:on-change))]
       ;; Let's call the first callback with a mock event modifying the value to &quot;Three&quot;
-      ((first callbacks) (hq/mock-change-event &quot;Three&quot;))
+      ((first callbacks) (rq/mock-change-event &quot;Three&quot;))
       ;; Now we should have &quot;Three&quot; instead of &quot;One&quot;
       (is (= (-&gt; (todo state)
-                 (hq/query :ul :li :input:value))
+                 (rq/query :ul :li :input:value))
              [&quot;Three&quot; &quot;Two&quot;])))</code></pre></div><div><span id="query"></span><h2><b>2 &nbsp;&nbsp; query</b></h2></div><div><p><code>query</code> is given a hiccup-like vector and zero or more additional arguments, and returns a sequence of results.</p></div><div><p>The idea comes from <a href='https://jquery.com'>jQuery</a>, where the <code>$</code> function (among other things) acts as a query function, returning a sequence of results based on the given path. Our <code>query</code> function is intended to do the same, based on a given hiccup-like vector.</p></div><div><p>When given no extra arguments, <code>query</code> returns a single result: the given vector.</p></div><div class="code"><pre><code class="clojure">q1
-    (is (= (hq/query [:div &quot;foo&quot; &quot;bar&quot;]) [[:div &quot;foo&quot; &quot;bar&quot;]]))</code></pre></div><div><p>When given an extra keyword argument matching the element type (the first element in the vector), the child elements are returned.</p></div><div class="code"><pre><code class="clojure">q2
-    (is (= (hq/query [:div &quot;foo&quot; &quot;bar&quot;] :div) [&quot;foo&quot; &quot;bar&quot;]))</code></pre></div><div><p>If the extra parameter does not match the element type, an empty sequence is returned.</p></div><div class="code"><pre><code class="clojure">q3
-    (is (= (hq/query [:div &quot;foo&quot; &quot;bar&quot;] :p) []))</code></pre></div><div><p>According to hiccup's convention, if the vector's second element is a map, it represents <i>attributes</i> for the element. If the extra argument is a keyword of the form <code>:elem:attr</code>, and if the <code>:elem</code> part matches the element, the value of the attribute <code>:attr</code> is returned.</p></div><div class="code"><pre><code class="clojure">q4
-    (is (= (hq/query [:div {:id &quot;x&quot;} &quot;foo&quot; &quot;bar&quot;] :div:id) [&quot;x&quot;]))</code></pre></div><div><p>If the second part of the keyword does not match an attribute, <code>nil</code> is added to the sequence.</p></div><div class="code"><pre><code class="clojure">q5
-    (is (= (hq/query [:div {:id &quot;x&quot;} &quot;foo&quot; &quot;bar&quot;] :div:not-an-attr) [nil]))</code></pre></div><div><p>If the first part of the keyword does not match the element, an empty sequence is returned.</p></div><div class="code"><pre><code class="clojure">q6
-    (is (= (hq/query [:div {:id &quot;x&quot;} &quot;foo&quot; &quot;bar&quot;] :p:id) []))</code></pre></div><div><p>The attribute map is ignored when returning the contents of an element.</p></div><div class="code"><pre><code class="clojure">q7
-    (is (= (hq/query [:div {:id &quot;x&quot;} &quot;foo&quot; &quot;bar&quot;] :div) [&quot;foo&quot; &quot;bar&quot;]))</code></pre></div><div><p>If an element is a sequence (e.g., created with a <code>for</code>), we operate on all its elements and concatenate the results.</p></div><div class="code"><pre><code class="clojure">q8
-    (is (= (hq/query [:ul
+    (is (= (rq/query [:div &quot;foo&quot; &quot;bar&quot;]) [[:div &quot;foo&quot; &quot;bar&quot;]]))</code></pre></div><div><p>When given an extra keyword argument matching the element type (the first element in the vector), the child elements are returned.</p></div><div class="code"><pre><code class="clojure">q2
+    (is (= (rq/query [:div &quot;foo&quot; &quot;bar&quot;] :div) [&quot;foo&quot; &quot;bar&quot;]))</code></pre></div><div><p>If the extra parameter does not match the element type, an empty sequence is returned.</p></div><div class="code"><pre><code class="clojure">q3
+    (is (= (rq/query [:div &quot;foo&quot; &quot;bar&quot;] :p) []))</code></pre></div><div><p>According to hiccup's convention, if the vector's second element is a map, it represents <i>attributes</i> for the element. If the extra argument is a keyword of the form <code>:elem:attr</code>, and if the <code>:elem</code> part matches the element, the value of the attribute <code>:attr</code> is returned.</p></div><div class="code"><pre><code class="clojure">q4
+    (is (= (rq/query [:div {:id &quot;x&quot;} &quot;foo&quot; &quot;bar&quot;] :div:id) [&quot;x&quot;]))</code></pre></div><div><p>If the second part of the keyword does not match an attribute, <code>nil</code> is added to the sequence.</p></div><div class="code"><pre><code class="clojure">q5
+    (is (= (rq/query [:div {:id &quot;x&quot;} &quot;foo&quot; &quot;bar&quot;] :div:not-an-attr) [nil]))</code></pre></div><div><p>If the first part of the keyword does not match the element, an empty sequence is returned.</p></div><div class="code"><pre><code class="clojure">q6
+    (is (= (rq/query [:div {:id &quot;x&quot;} &quot;foo&quot; &quot;bar&quot;] :p:id) []))</code></pre></div><div><p>The attribute map is ignored when returning the contents of an element.</p></div><div class="code"><pre><code class="clojure">q7
+    (is (= (rq/query [:div {:id &quot;x&quot;} &quot;foo&quot; &quot;bar&quot;] :div) [&quot;foo&quot; &quot;bar&quot;]))</code></pre></div><div><p>If an element is a sequence (e.g., created with a <code>for</code>), we operate on all its elements and concatenate the results.</p></div><div class="code"><pre><code class="clojure">q8
+    (is (= (rq/query [:ul
                       [:li {:key -1}]
                       (for [i (range 3)]
                         [:li {:key i}])] :ul :li:key) [-1 0 1 2]))</code></pre></div><div><span id="paths"></span><h3>2.1 &nbsp;&nbsp; Paths</h3></div><div><p>Every additional argument is applied to all the results of applying the previous argument. For example, if we have a <code>:ul</code> element containing multiple <code>:li</code> elements, each containing a <code>:p</code> element and some text, The path <code>:ul :li :p</code> will return a sequence of the strings.</p></div><div class="code"><pre><code class="clojure">q-agg1
-    (is (= (hq/query [:ul
+    (is (= (rq/query [:ul
                       [:li [:p &quot;One&quot;]]
                       [:li [:p &quot;Two&quot;]]
                       [:li [:p &quot;Three&quot;]]] :ul :li :p) [&quot;One&quot; &quot;Two&quot; &quot;Three&quot;]))</code></pre></div><div><span id="classes"></span><h3>2.2 &nbsp;&nbsp; Classes</h3></div><div><p>When a path element starts with a dot (<code>.</code>), it is treated as a class matcher. This means that it is expected to match against elements that have a <code>:class</code> attribute that includes the given class name. For example, in the following example only "Two" has the class <code>selected</code>, hence it is the only one to be returned.</p></div><div class="code"><pre><code class="clojure">q-cls1
-    (is (= (hq/query [:ul
+    (is (= (rq/query [:ul
                       [:li {:class &quot;other&quot;} [:p &quot;One&quot;]]
                       [:li {:class &quot;other selected&quot;} [:p &quot;Two&quot;]]
                       [:li [:p &quot;Three&quot;]]] :ul :.selected :p) [&quot;Two&quot;]))</code></pre></div><div><p>The keyword can match at the same time against an element type and any number of classes. For example, the keyword <code>:li.foo.bar</code> matches against <code>:li</code> elements that have both the <code>foo</code> and the <code>bar</code> classes.</p></div><div class="code"><pre><code class="clojure">q-cls2
-    (is (= (hq/query [:ul
+    (is (= (rq/query [:ul
                       [:li {:class &quot;foo&quot;} [:p &quot;One&quot;]]
                       [:li {:class &quot;bar&quot;} [:p &quot;Two&quot;]]
                       [:li {:class &quot;bar foo&quot;} [:p &quot;Three&quot;]]] :ul :li.foo.bar :p) [&quot;Three&quot;]))</code></pre></div><div><span id="mock-change-event"></span><h2><b>3 &nbsp;&nbsp; mock-change-event</b></h2></div><div><p><code>mock-change-event</code> is a conveniece function that creates a mock <code>:on-change</code> event. The function takes as parameter a new value, and generates a Javascript object that has a single member: <code>target</code>, which by itself is a Javascript object with one field: <code>value</code>, containing the given value.</p></div><div class="code"><pre><code class="clojure">mce1
-    (let [ev (hq/mock-change-event &quot;val&quot;)]
+    (let [ev (rq/mock-change-event &quot;val&quot;)]
       (is (= (.-target.value ev) &quot;val&quot;)))</code></pre></div>
         </div>
       </div>

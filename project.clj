@@ -54,4 +54,4 @@
                      :title "reagent-query"
                      :subtitle "Test helpers for reagent code"}}})
 
-;; echo "(use 'lucid-publish) (copy-assets) (publish-all)" | lein repl
+;; echo "(use 'lucid.gpublish) (copy-assets) (publish-all)" | lein repl
