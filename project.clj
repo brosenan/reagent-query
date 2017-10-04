@@ -1,6 +1,6 @@
-(defproject reagent-query "0.1.0-SNAPSHOT"
-  :description "FIXME: write description"
-  :url "http://example.com/FIXME"
+(defproject brosenan/reagent-query "0.1.0-SNAPSHOT"
+  :description "A helper library for testing Reagent code as pure functions "
+  :url "https://github.com/brosenan/reagent-query"
   :license {:name "Eclipse Public License"
             :url "http://www.eclipse.org/legal/epl-v10.html"}
   :dependencies [[org.clojure/clojure "1.8.0"]
