@@ -114,7 +114,7 @@ The following test uses `reagent-query` to test the above function, without usin
 ```
 
 ## License
-Copyright © 2017 FIXME
+Copyright © 2017 Boaz Rosenan
 
 Distributed under the Eclipse Public License either version 1.0 or (at
 your option) any later version.
