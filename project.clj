@@ -44,10 +44,10 @@
   :main ^:skip-aot reagent-query.core
   :target-path "target/%s"
   
-  :publish {:site   "reagent-query"
-            :theme  "bolton" ;; stark is the default
+  :publish {:site "reagent-query"
+            :theme "bolton" ;; stark is the default
             :output "docs"
             :files {"core"
                     {:input "test/reagent_query/core_test.cljs"
-                     :title "Core Functionality"
+                     :title "reagent-query"
                      :subtitle "Test helpers for reagent code"}}})
