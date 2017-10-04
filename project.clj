@@ -46,8 +46,8 @@
   
   :publish {:site   "reagent-query"
             :theme  "bolton" ;; stark is the default
-            :output "doc"
+            :output "docs"
             :files {"core"
                     {:input "test/reagent_query/core_test.cljs"
                      :title "Core Functionality"
-                     :subtitle "Querying hiccup vectors"}}})
+                     :subtitle "Test helpers for reagent code"}}})
