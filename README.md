@@ -5,6 +5,7 @@ A helper library for testing Reagent code as pure functions
 ## Installation
 
 Add the following to your leiningen / boot project:
+
 [![Clojars Project](https://img.shields.io/clojars/v/brosenan/reagent-query.svg)](https://clojars.org/brosenan/reagent-query)
 
 ## Overview
