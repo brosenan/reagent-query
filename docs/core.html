@@ -61,9 +61,9 @@
           <div class="heading">
             <div>
               <h5>Author: Boaz Rosenan</h5>
-              <h5>Date: 04 October 2017</h5>
+              <h5>Date: 07 October 2017</h5>
               <h5>Repository: <a href="https://github.com/brosenan/reagent-query">https://github.com/brosenan/reagent-query</a></h5>
-              <h5>Version: 0.1.0-SNAPSHOT</h5></div></div>
+              <h5>Version: 0.1.1-SNAPSHOT</h5></div></div>
           <hr/>
           <div class="outline">
             <div class="toc">
@@ -170,7 +170,11 @@
     (is (= (rq/query [:ul
                       [:li {:class &quot;foo&quot;} [:p &quot;One&quot;]]
                       [:li {:class &quot;bar&quot;} [:p &quot;Two&quot;]]
-                      [:li {:class &quot;bar foo&quot;} [:p &quot;Three&quot;]]] :ul :li.foo.bar :p) [&quot;Three&quot;]))</code></pre></div><div><span id="mock-change-event"></span><h2><b>3 &nbsp;&nbsp; mock-change-event</b></h2></div><div><p><code>mock-change-event</code> is a conveniece function that creates a mock <code>:on-change</code> event. The function takes as parameter a new value, and generates a Javascript object that has a single member: <code>target</code>, which by itself is a Javascript object with one field: <code>value</code>, containing the given value.</p></div><div class="code"><pre><code class="clojure">mce1
+                      [:li {:class &quot;bar foo&quot;} [:p &quot;Three&quot;]]] :ul :li.foo.bar :p) [&quot;Three&quot;]))</code></pre></div><div><p>Classes can be used in conjunction with attributes.</p></div><div class="code"><pre><code class="clojure">q-cls3
+    (is (= (rq/query [:div
+                      [:a {:href &quot;foo.html&quot;}]
+                      [:a {:href &quot;bar.html&quot; :class &quot;selected&quot;}]
+                      [:a {:href &quot;baz.html&quot;}]] :div :a.selected:href) [&quot;bar.html&quot;]))</code></pre></div><div><span id="mock-change-event"></span><h2><b>3 &nbsp;&nbsp; mock-change-event</b></h2></div><div><p><code>mock-change-event</code> is a conveniece function that creates a mock <code>:on-change</code> event. The function takes as parameter a new value, and generates a Javascript object that has a single member: <code>target</code>, which by itself is a Javascript object with one field: <code>value</code>, containing the given value.</p></div><div class="code"><pre><code class="clojure">mce1
     (let [ev (rq/mock-change-event &quot;val&quot;)]
       (is (= (.-target.value ev) &quot;val&quot;)))</code></pre></div>
         </div>
