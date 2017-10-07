@@ -34,8 +34,8 @@ it will still test different than the one created by the function I'm testing.
 Documentation can be found [here](https://brosenan.github.io/reagent-query/core.html).
 
 ## Examples
-> This example is taken from the [documentation](https://brosenan.github.io/reagent-query/core.html#example).
-> Please refer to it for up-to-date usage.
+> This example is taken from the [documentation](https://brosenan.github.io/reagent-query/core.html).
+> Please refer to the [original examle](https://brosenan.github.io/reagent-query/core.html#example) for up-to-date usage.
 
 Consider the following function defining a component in Reagent:
 ```Clojure
