@@ -182,6 +182,13 @@ For example, the keyword `:li.foo.bar` matches against `:li` elements that have 
                         [:li {:class "bar"} [:p "Two"]]
                         [:li {:class "bar foo"} [:p "Three"]]] :ul :li.foo.bar :p) ["Three"])))
 
+"Classes can be used in conjunction with attributes."
+(fact q-cls3
+      (is (= (rq/query [:div
+                        [:a {:href "foo.html"}]
+                        [:a {:href "bar.html" :class "selected"}]
+                        [:a {:href "baz.html"}]] :div :a.selected:href) ["bar.html"])))
+
 [[:chapter {:title "mock-change-event"}]]
 "`mock-change-event` is a conveniece function that creates a mock `:on-change` event.
 The function takes as parameter a new value, and generates a Javascript object that has a single member: `target`,

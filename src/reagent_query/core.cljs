@@ -21,7 +21,7 @@
           (cond
             (elem-and-class-matches step elem (:class attrs)) content
             (and (not (nil? attr))
-                 (= (name elem)  exp-elem)) (list (attrs (keyword attr)))
+                 (elem-and-class-matches exp-elem elem (:class attrs))) (list (attrs (keyword attr)))
             :else (list)))))
 
 (defn query [vec & path]
