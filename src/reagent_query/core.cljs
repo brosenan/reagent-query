@@ -1,28 +1,43 @@
 (ns reagent-query.core
   (:require [clojure.string :as str]))
 
-(defn elem-and-class-matches [kw elem cls]
-  (let [[req-elem & req-cls] (str/split (name kw) #"[.]")
-        act-classes (set (str/split cls #" "))]
-    (and (or (= req-elem "")
-             (=  req-elem (name elem)))
-         (every? #(contains? act-classes %) req-cls))))
+(defn keyword-to-map [kw]
+  (let [[s attr] (str/split (name kw) #"[:]")
+        [elem & classes] (str/split s #"[.]")]
+    {:elem (if (= elem "") nil elem)
+     :classes (set classes)
+     :attr attr}))
 
 (defn query-step [vec step]
-  (cond (seq? vec)
-        (mapcat #(query-step % step) vec)
-        :else
-        (let [[elem & content] vec
-              [attrs content] (cond (map? (first content))
-                                    [(first content) (rest content)]
-                                    :else
-                                    [{} content])
-              [exp-elem attr] (str/split (name step) #":")]
-          (cond
-            (elem-and-class-matches step elem (:class attrs)) content
-            (and (not (nil? attr))
-                 (elem-and-class-matches exp-elem elem (:class attrs))) (list (attrs (keyword attr)))
-            :else (list)))))
+  (let [step (cond (keyword? step) (keyword-to-map step)
+                   (map? step) step)]
+    (cond (seq? vec)
+          (mapcat #(query-step % step) vec)
+          :else
+          (let [[act-elem & content] vec
+                [attrs content] (cond (map? (first content))
+                                      [(first content) (rest content)]
+                                      :else
+                                      [{} content])
+                act-classes (set (str/split (:class attrs) #" "))
+                {:keys [elem attr classes attr-vals]} step]
+            (cond
+              (or (nil? elem)
+                  (= elem (name act-elem)))
+              (cond (every? #(contains? act-classes %) classes)
+                    (cond (nil? attr)
+                          (cond (or (nil? attr-vals)
+                                    (every? (fn [[k v]]
+                                              (= (attrs k) v)) attr-vals))
+                                content
+                                :else
+                                (list))
+                          :else
+                          (list (attrs (keyword attr))))
+                    :else
+                    (list))
+              :else
+              (list))))))
 
 (defn query [vec & path]
   (loop [res (list vec)
@@ -39,3 +54,4 @@
     (aset ctrl "value" val)
     (aset ev "target" ctrl)
     ev))
+
