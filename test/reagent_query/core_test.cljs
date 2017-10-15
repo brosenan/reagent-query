@@ -219,6 +219,29 @@ The following example is exactly the same as the previous one, only that it uses
                         [:li {:foo 1 :bar 2} "C"]]
                        :ul [:li {:foo 1 :bar 2}]) ["C"])))
 
+[[:chapter {:title "find"}]]
+"`find` is similar to `query`, only that it searches for its matches starting _anywhere in the hierarcy_,
+not necessarily at the given root."
+
+"For example, consider the following hiccup-like structure:"
+(defonce find-example
+  [:div
+   [:ul
+    [:li {:class "cart-item"}
+     [:p "Keyboard"]]
+    [:li {:class "cart-item current"}
+     [:p "Mouse"]]
+    [:li {:class "cart-item"}
+     [:p "Monitor"]]]])
+
+"We can list all items by simply finding all `:p` elements that are direct descendants of `:.cart-item`s."
+(fact find1
+      (is (= (rq/find find-example :.cart-item :p) ["Keyboard" "Mouse" "Monitor"])))
+
+"Similarly, if we only want the current item we can look for it directly:"
+(fact find2
+      (is (= (rq/find find-example :.current :p) ["Mouse"])))
+
 [[:chapter {:title "mock-change-event"}]]
 "`mock-change-event` is a conveniece function that creates a mock `:on-change` event.
 The function takes as parameter a new value, and generates a Javascript object that has a single member: `target`,
@@ -258,3 +281,38 @@ which by itself is a Javascript object with one field: `value`, containing the g
       (let [m (rq/keyword-to-map :foo:quux)]
         (is (= (:elem m) "foo"))
         (is (= (:attr m) "quux"))))
+
+[[:section {:title "all-elems"}]]
+"The `all-elems` function takes a hiccup-like vector and returns all its sub-components that represent elements, at any nesting level."
+
+"For a simple element (with no nested elements), `all-elems` returns the element itself as a single result."
+(fact all-elems1
+      (is (= (rq/all-elems [:hr]) [[:hr]])))
+
+"If child elements exist, they appear in the returned sequence after the root."
+(fact all-elems2
+      (let [example [:ul
+                     [:li "One"]
+                     [:li "Two"]
+                     [:li "Three"]]
+            all (rq/all-elems example)]
+        (is (= (first all) example))
+        (is (= (rest all) (rest example)))))
+
+"Child elements that do not represent HTML elements (i.e., not vectors) are ignored."
+(fact all-elems3
+      (is (= (count (rq/all-elems [:h1 "Hello" "World"])) 1)))
+
+"`all-elems` works recursively.
+Consider for example the following structure:"
+(defonce example1
+  [:div
+   [:h1 "The Title"]
+   [:ul
+    (for [[i s] (map-indexed vector ["Zero" "One" "Two"])]
+      [:li {:key i}
+       [:p s]])]])
+
+"Applying `all-elems` on this structure will emit 1 `:div`, 1 `:h1`, 1 `:ul`, 3 `:li` and 3 `:p` elements."
+(fact all-elems4
+      (is (= (count (rq/all-elems example1)) (+ 1 1 1 3 3))))

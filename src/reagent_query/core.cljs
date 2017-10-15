@@ -58,3 +58,13 @@
     (aset ev "target" ctrl)
     ev))
 
+(defn all-elems [root]
+  (cond (seq? root)
+        (mapcat all-elems root)
+        :else
+        (cons root (->> (rest root)
+                        (mapcat all-elems)
+                        (filter vector?)))))
+
+(defn find [root & path]
+  (apply query (all-elems root) path))
