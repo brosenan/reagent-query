@@ -10,7 +10,10 @@
 
 (defn query-step [vec step]
   (let [step (cond (keyword? step) (keyword-to-map step)
-                   (map? step) step)]
+                   (map? step) step
+                   (vector? step) (let [[kw attr-vals] step]
+                                    (-> (keyword-to-map kw)
+                                        (assoc :attr-vals attr-vals))))]
     (cond (seq? vec)
           (mapcat #(query-step % step) vec)
           :else

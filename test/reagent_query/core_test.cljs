@@ -209,6 +209,16 @@ For example, the selector `:a.selected:href` can be replaced with a map, as foll
                        :ul {:elem "li"
                             :attr-vals {:foo 1 :bar 2}}) ["C"])))
 
+"As shorthand, if a selector is a 2-element vector, its first element is [treated as a keyword](#keyword-to-map),
+and its second argument is taken as the `:attr-vals` map.
+The following example is exactly the same as the previous one, only that it uses the shorthand notation."
+(fact q-attr3
+      (is (= (rq/query [:ul
+                        [:li {:foo 1} "A"]
+                        [:li {:foo 3 :bar 2} "B"]
+                        [:li {:foo 1 :bar 2} "C"]]
+                       :ul [:li {:foo 1 :bar 2}]) ["C"])))
+
 [[:chapter {:title "mock-change-event"}]]
 "`mock-change-event` is a conveniece function that creates a mock `:on-change` event.
 The function takes as parameter a new value, and generates a Javascript object that has a single member: `target`,
