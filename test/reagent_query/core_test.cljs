@@ -39,76 +39,106 @@ We can extract event handlers and call them to see how they change the state, et
 
 "The following component function takes as parameter an atom containing its state.
 The state consists of a sequence of \"todo\" tasks, given as maps, each containing a unique `:id` and a `:todo` string.
-The component creates a `:ul` with a `:li` for each task, with an `:input` box containing the text and a `:button` for deleting the task."
+The component creates a `:div` containing a `:ul` with a `:li` for each task, with an `:input` box containing the text and a `:button` for deleting the task.
+In addition, the `:div` also contains a `:button` for creating a new task."
 
 (defn todo [state]
-  [:ul
-   (for [{:keys [id todo]} @state]
-     [:li {:key id}
-      [:input {:value todo
-               :on-change #(swap! state
-                                  (partial map
-                                           (fn [x]
-                                             (if (= (:id x) id)
-                                               (assoc x :todo (.-target.value %))
-                                               x))))}]
-      [:button {:on-click #(swap! state
-                                  (partial filter
-                                           (fn [x]
-                                             (not= (:id x) id))))} "Done"]])])
+  [:div
+   [:ul
+    (for [{:keys [id todo]} @state]
+      [:li {:key id
+            :class "task"}
+       [:input {:value todo
+                :on-change #(swap! state
+                                   (partial map
+                                            (fn [x]
+                                              (if (= (:id x) id)
+                                                (assoc x :todo (.-target.value %))
+                                                x))))}]
+       [:button {:class "delete-task"
+                 :on-click #(swap! state
+                                   (partial filter
+                                            (fn [x]
+                                              (not= (:id x) id))))} "Done"]])]
+   [:button {:class "add-task"
+             :on-click #(swap! state
+                               conj {:id (->> @state
+                                              (map :id)
+                                              (reduce max)
+                                              inc)
+                                     :todo ""})}
+    "Add Task"]])
 
 "These are the tests:"
 (fact todo-example
       ;; Empty list
       (let [state (atom [])]
         (is (= (-> (todo state)
-                   (rq/query :ul :li))
+                   (rq/find :li.task))
                [])))
 
       ;; The :id field should be the :li's :key attribute
       (let [state (atom [{:id 1 :todo "One"}
                          {:id 2 :todo "Two"}])]
         (is (= (-> (todo state)
-                   (rq/query :ul :li:key))
+                   (rq/find :li:key))
                [1 2])))
 
       ;; Each element includes an :input box with the :todo value as :value
       (let [state (atom [{:id 1 :todo "One"}
                          {:id 2 :todo "Two"}])]
         (is (= (-> (todo state)
-                   (rq/query :ul :li :input:value))
+                   (rq/find :input:value))
                ["One" "Two"])))
 
       ;; Each :li element has a :button with "Done" as text
       (let [state (atom [{:id 1 :todo "One"}
                          {:id 2 :todo "Two"}])]
         (is (= (-> (todo state)
-                   (rq/query :ul :li :button))
+                   (rq/find :button.delete-task))
                ["Done" "Done"])))
 
       ;; The :on-click callback associated with each button deletes the respective entry in the atom
       (let [state (atom [{:id 1 :todo "One"}
                          {:id 2 :todo "Two"}])
             callbacks (-> (todo state)
-                          (rq/query :ul :li :button:on-click))]
+                          (rq/find :button.delete-task:on-click))]
         ;; Let's call the second callback
         ((second callbacks))
         ;; Now we should only have "One"
         (is (= (-> (todo state)
-                   (rq/query :ul :li :input:value))
+                   (rq/find :li.task :input:value))
                ["One"])))
 
       ;; The :on-change callback of the :input box update the :todo of that entry
       (let [state (atom [{:id 1 :todo "One"}
                          {:id 2 :todo "Two"}])
             callbacks (-> (todo state)
-                          (rq/query :ul :li :input:on-change))]
+                          (rq/find :li.task :input:on-change))]
         ;; Let's call the first callback with a mock event modifying the value to "Three"
         ((first callbacks) (rq/mock-change-event "Three"))
         ;; Now we should have "Three" instead of "One"
         (is (= (-> (todo state)
-                   (rq/query :ul :li :input:value))
-               ["Three" "Two"]))))
+                   (rq/find :li.task :input:value))
+               ["Three" "Two"])))
+
+      ;; An "Add Task" button adds a new (empty) task
+      (let [state (atom [{:id 1 :todo "One"}
+                         {:id 2 :todo "Two"}])]
+        (is (= (-> (todo state)
+                   (rq/find :button.add-task)) ["Add Task"]))
+        ;; We click it
+        (let [[add] (-> (todo state)
+                        (rq/find :button.add-task:on-click))]
+          (add)
+          ;; Now we should have a third element
+          (is (= (-> (todo state)
+                     (rq/find :li.task:key))
+                 [1 2 3]))
+          ;; With an empty 
+          (is (= (-> (todo state)
+                     (rq/find :li.task :input:value))
+                 ["One" "Two" ""])))))
 
 [[:chapter {:title "query"}]]
 "`query` is given a hiccup-like vector and zero or more additional arguments, and returns a sequence of results."

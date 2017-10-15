@@ -40,77 +40,106 @@ Documentation can be found [here](https://brosenan.github.io/reagent-query/core.
 Consider the following function defining a component in Reagent:
 ```Clojure
 (defn todo [state]
-  [:ul
-   (for [{:keys [id todo]} @state]
-     [:li {:key id}
-      [:input {:value todo
-               :on-change #(swap! state
-                                  (partial map
-                                           (fn [x]
-                                             (if (= (:id x) id)
-                                               (assoc x :todo (.-target.value %))
-                                               x))))}]
-      [:button {:on-click #(swap! state
-                                  (partial filter
-                                           (fn [x]
-                                             (not= (:id x) id))))} "Done"]])])
+  [:div
+   [:ul
+    (for [{:keys [id todo]} @state]
+      [:li {:key id
+            :class "task"}
+       [:input {:value todo
+                :on-change #(swap! state
+                                   (partial map
+                                            (fn [x]
+                                              (if (= (:id x) id)
+                                                (assoc x :todo (.-target.value %))
+                                                x))))}]
+       [:button {:class "delete-task"
+                 :on-click #(swap! state
+                                   (partial filter
+                                            (fn [x]
+                                              (not= (:id x) id))))} "Done"]])]
+   [:button {:class "add-task"
+             :on-click #(swap! state
+                               conj {:id (->> @state
+                                              (map :id)
+                                              (reduce max)
+                                              inc)
+                                     :todo ""})}
+    "Add Task"]])
 ```
 
 
 The following test uses `reagent-query` to test the above function, without using reagent.
 
 ```Clojure
-(deftest todo-example
+(fact todo-example
       ;; Empty list
       (let [state (atom [])]
         (is (= (-> (todo state)
-                   (rq/query :ul :li))
+                   (rq/find :li.task))
                [])))
 
       ;; The :id field should be the :li's :key attribute
       (let [state (atom [{:id 1 :todo "One"}
                          {:id 2 :todo "Two"}])]
         (is (= (-> (todo state)
-                   (rq/query :ul :li:key))
+                   (rq/find :li:key))
                [1 2])))
 
       ;; Each element includes an :input box with the :todo value as :value
       (let [state (atom [{:id 1 :todo "One"}
                          {:id 2 :todo "Two"}])]
         (is (= (-> (todo state)
-                   (rq/query :ul :li :input:value))
+                   (rq/find :input:value))
                ["One" "Two"])))
 
       ;; Each :li element has a :button with "Done" as text
       (let [state (atom [{:id 1 :todo "One"}
                          {:id 2 :todo "Two"}])]
         (is (= (-> (todo state)
-                   (rq/query :ul :li :button))
+                   (rq/find :button.delete-task))
                ["Done" "Done"])))
 
       ;; The :on-click callback associated with each button deletes the respective entry in the atom
       (let [state (atom [{:id 1 :todo "One"}
                          {:id 2 :todo "Two"}])
             callbacks (-> (todo state)
-                          (rq/query :ul :li :button:on-click))]
+                          (rq/find :button.delete-task:on-click))]
         ;; Let's call the second callback
         ((second callbacks))
         ;; Now we should only have "One"
         (is (= (-> (todo state)
-                   (rq/query :ul :li :input:value))
+                   (rq/find :li.task :input:value))
                ["One"])))
 
       ;; The :on-change callback of the :input box update the :todo of that entry
       (let [state (atom [{:id 1 :todo "One"}
                          {:id 2 :todo "Two"}])
             callbacks (-> (todo state)
-                          (rq/query :ul :li :input:on-change))]
+                          (rq/find :li.task :input:on-change))]
         ;; Let's call the first callback with a mock event modifying the value to "Three"
         ((first callbacks) (rq/mock-change-event "Three"))
         ;; Now we should have "Three" instead of "One"
         (is (= (-> (todo state)
-                   (rq/query :ul :li :input:value))
-               ["Three" "Two"]))))
+                   (rq/find :li.task :input:value))
+               ["Three" "Two"])))
+
+      ;; An "Add Task" button adds a new (empty) task
+      (let [state (atom [{:id 1 :todo "One"}
+                         {:id 2 :todo "Two"}])]
+        (is (= (-> (todo state)
+                   (rq/find :button.add-task)) ["Add Task"]))
+        ;; We click it
+        (let [[add] (-> (todo state)
+                        (rq/find :button.add-task:on-click))]
+          (add)
+          ;; Now we should have a third element
+          (is (= (-> (todo state)
+                     (rq/find :li.task:key))
+                 [1 2 3]))
+          ;; With an empty 
+          (is (= (-> (todo state)
+                     (rq/find :li.task :input:value))
+                 ["One" "Two" ""])))))
 ```
 
 ## License

@@ -59,12 +59,11 @@
     ev))
 
 (defn all-elems [root]
-  (cond (seq? root)
-        (mapcat all-elems root)
-        :else
-        (cons root (->> (rest root)
-                        (mapcat all-elems)
-                        (filter vector?)))))
+  (cond (vector? root) (cons root (->> (rest root)
+                                       (mapcat all-elems)
+                                       (filter vector?)))
+        (seq? root)    (mapcat all-elems root)
+        :else          (list)))
 
 (defn find [root & path]
   (apply query (all-elems root) path))
