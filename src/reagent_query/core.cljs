@@ -60,8 +60,7 @@
 
 (defn all-elems [root]
   (cond (vector? root) (cons root (->> (rest root)
-                                       (mapcat all-elems)
-                                       (filter vector?)))
+                                       (mapcat all-elems)))
         (seq? root)    (mapcat all-elems root)
         :else          (list)))
 
