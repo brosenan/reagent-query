@@ -184,6 +184,7 @@ the value of the attribute `:attr` is returned."
                         (for [i (range 3)]
                           [:li {:key i}])] :ul :li:key) [-1 0 1 2])))
 
+
 [[:section {:title "Paths"}]]
 "Every additional argument is applied to all the results of applying the previous argument.
 For example, if we have a `:ul` element containing multiple `:li` elements, each containing a `:p` element and some text,
@@ -226,7 +227,7 @@ For example, the selector `:a.selected:href` can be replaced with a map, as foll
       (is (= (rq/query [:div
                         [:a {:href "foo.html"}]
                         [:a {:href "bar.html" :class "selected"}]
-                        [:a {:href "baz.html"}]] :div {:elem "a"
+                        [:a {:href "baz.html"}]] :div {:elem :a
                                                        :classes #{"selected"}
                                                        :attr "href"}) ["bar.html"])))
 
@@ -236,7 +237,7 @@ For example, the selector `:a.selected:href` can be replaced with a map, as foll
                         [:li {:foo 1} "A"]
                         [:li {:foo 3 :bar 2} "B"]
                         [:li {:foo 1 :bar 2} "C"]]
-                       :ul {:elem "li"
+                       :ul {:elem :li
                             :attr-vals {:foo 1 :bar 2}}) ["C"])))
 
 "As shorthand, if a selector is a 2-element vector, its first element is [treated as a keyword](#keyword-to-map),
@@ -283,7 +284,7 @@ which by itself is a Javascript object with one field: `value`, containing the g
 [[:chapter {:title "Under the Hood"}]]
 [[:section {:title "keyword-to-map"}]]
 "Under the hood, `reagent-query` paths consist of maps with the following optional fields:
-1. `:elem`: The element name to match (a string).
+1. `:elem`: The element name to match
 2. `:classes`: A set of strings, each needs to be a class in the element.
 3. `:attr`: If present, the result is the contents of the specified attribute, and not the contents of the element.
 4. `:attr-vals`: A map of attributes with their respective values. If present, all attribute values must match."
@@ -292,12 +293,12 @@ which by itself is a Javascript object with one field: `value`, containing the g
 
 "By default, a keyword maps into a map with an `:elem` field, of that value converted to a string."
 (fact keyword-to-map1
-      (is (= (:elem (rq/keyword-to-map :my-elem)) "my-elem")))
+      (is (= (:elem (rq/keyword-to-map :my-elem)) :my-elem)))
 
 "When the keyword contains dots (`.`), the part of its name that precedes the first dot is considered the `:elem`, and the other parts are taken as the `:classes` set."
 (fact keyword-to-map2
       (let [m (rq/keyword-to-map :foo.bar.baz)]
-        (is (= (:elem m) "foo"))
+        (is (= (:elem m) :foo))
         (is (= (:classes m) #{"bar" "baz"}))))
 
 "Omitting the element makes it `nil`."
@@ -309,7 +310,7 @@ which by itself is a Javascript object with one field: `value`, containing the g
 "When the keyword contains a colon (`:`), the right-hand-side of the colon is taken as the `:attr` field."
 (fact keyword-to-map4
       (let [m (rq/keyword-to-map :foo:quux)]
-        (is (= (:elem m) "foo"))
+        (is (= (:elem m) :foo))
         (is (= (:attr m) "quux"))))
 
 [[:section {:title "all-elems"}]]

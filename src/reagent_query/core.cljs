@@ -4,7 +4,7 @@
 (defn keyword-to-map [kw]
   (let [[s attr] (str/split (name kw) #"[:]")
         [elem & classes] (str/split s #"[.]")]
-    {:elem (if (= elem "") nil elem)
+    {:elem (if (= elem "") nil (keyword elem))
      :classes (set classes)
      :attr attr}))
 
@@ -26,7 +26,7 @@
                 {:keys [elem attr classes attr-vals]} step]
             (cond
               (or (nil? elem)
-                  (= elem (name act-elem)))
+                  (= elem act-elem))
               (cond (every? #(contains? act-classes %) classes)
                     (cond (nil? attr)
                           (cond (or (nil? attr-vals)
