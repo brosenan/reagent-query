@@ -61,9 +61,9 @@
           <div class="heading">
             <div>
               <h5>Author: Boaz Rosenan</h5>
-              <h5>Date: 15 October 2017</h5>
+              <h5>Date: 18 October 2017</h5>
               <h5>Repository: <a href="https://github.com/brosenan/reagent-query">https://github.com/brosenan/reagent-query</a></h5>
-              <h5>Version: 0.2.0-SNAPSHOT</h5></div></div>
+              <h5>Version: 0.2.2-SNAPSHOT</h5></div></div>
           <hr/>
           <div class="outline">
             <div class="toc">
@@ -207,14 +207,14 @@
     (is (= (rq/query [:div
                       [:a {:href &quot;foo.html&quot;}]
                       [:a {:href &quot;bar.html&quot; :class &quot;selected&quot;}]
-                      [:a {:href &quot;baz.html&quot;}]] :div {:elem &quot;a&quot;
+                      [:a {:href &quot;baz.html&quot;}]] :div {:elem :a
                                                      :classes #{&quot;selected&quot;}
                                                      :attr &quot;href&quot;}) [&quot;bar.html&quot;]))</code></pre></div><div><p>If a map selector contains a <code>:attr-vals</code> field, every key/value pair in the given map is checked against the attributes of the element under test.</p></div><div class="code"><pre><code class="clojure">q-attr2
     (is (= (rq/query [:ul
                       [:li {:foo 1} &quot;A&quot;]
                       [:li {:foo 3 :bar 2} &quot;B&quot;]
                       [:li {:foo 1 :bar 2} &quot;C&quot;]]
-                     :ul {:elem &quot;li&quot;
+                     :ul {:elem :li
                           :attr-vals {:foo 1 :bar 2}}) [&quot;C&quot;]))</code></pre></div><div><p>As shorthand, if a selector is a 2-element vector, its first element is <a href='#keyword-to-map'>treated as a keyword</a>, and its second argument is taken as the <code>:attr-vals</code> map. The following example is exactly the same as the previous one, only that it uses the shorthand notation.</p></div><div class="code"><pre><code class="clojure">q-attr3
     (is (= (rq/query [:ul
                       [:li {:foo 1} &quot;A&quot;]
@@ -232,16 +232,16 @@
     (is (= (rq/find find-example :.cart-item :p) [&quot;Keyboard&quot; &quot;Mouse&quot; &quot;Monitor&quot;]))</code></pre></div><div><p>Similarly, if we only want the current item we can look for it directly:</p></div><div class="code"><pre><code class="clojure">find2
     (is (= (rq/find find-example :.current :p) [&quot;Mouse&quot;]))</code></pre></div><div><span id="mock-change-event"></span><h2><b>4 &nbsp;&nbsp; mock-change-event</b></h2></div><div><p><code>mock-change-event</code> is a conveniece function that creates a mock <code>:on-change</code> event. The function takes as parameter a new value, and generates a Javascript object that has a single member: <code>target</code>, which by itself is a Javascript object with one field: <code>value</code>, containing the given value.</p></div><div class="code"><pre><code class="clojure">mce1
     (let [ev (rq/mock-change-event &quot;val&quot;)]
-      (is (= (.-target.value ev) &quot;val&quot;)))</code></pre></div><div><span id="under-the-hood"></span><h2><b>5 &nbsp;&nbsp; Under the Hood</b></h2></div><div><span id="keyword-to-map"></span><h3>5.1 &nbsp;&nbsp; keyword-to-map</h3></div><div><p>Under the hood, <code>reagent-query</code> paths consist of maps with the following optional fields:</p><ol><li><code>:elem</code>: The element name to match (a string).</li><li><code>:classes</code>: A set of strings, each needs to be a class in the element.</li><li><code>:attr</code>: If present, the result is the contents of the specified attribute, and not the contents of the element.</li><li><code>:attr-vals</code>: A map of attributes with their respective values. If present, all attribute values must match.</li></ol></div><div><p><code>keyword-to-map</code> converts a keyword to such a map, using the following rules.</p></div><div><p>By default, a keyword maps into a map with an <code>:elem</code> field, of that value converted to a string.</p></div><div class="code"><pre><code class="clojure">keyword-to-map1
-    (is (= (:elem (rq/keyword-to-map :my-elem)) &quot;my-elem&quot;))</code></pre></div><div><p>When the keyword contains dots (<code>.</code>), the part of its name that precedes the first dot is considered the <code>:elem</code>, and the other parts are taken as the <code>:classes</code> set.</p></div><div class="code"><pre><code class="clojure">keyword-to-map2
+      (is (= (.-target.value ev) &quot;val&quot;)))</code></pre></div><div><span id="under-the-hood"></span><h2><b>5 &nbsp;&nbsp; Under the Hood</b></h2></div><div><span id="keyword-to-map"></span><h3>5.1 &nbsp;&nbsp; keyword-to-map</h3></div><div><p>Under the hood, <code>reagent-query</code> paths consist of maps with the following optional fields:</p><ol><li><code>:elem</code>: The element name to match</li><li><code>:classes</code>: A set of strings, each needs to be a class in the element.</li><li><code>:attr</code>: If present, the result is the contents of the specified attribute, and not the contents of the element.</li><li><code>:attr-vals</code>: A map of attributes with their respective values. If present, all attribute values must match.</li></ol></div><div><p><code>keyword-to-map</code> converts a keyword to such a map, using the following rules.</p></div><div><p>By default, a keyword maps into a map with an <code>:elem</code> field, of that value converted to a string.</p></div><div class="code"><pre><code class="clojure">keyword-to-map1
+    (is (= (:elem (rq/keyword-to-map :my-elem)) :my-elem))</code></pre></div><div><p>When the keyword contains dots (<code>.</code>), the part of its name that precedes the first dot is considered the <code>:elem</code>, and the other parts are taken as the <code>:classes</code> set.</p></div><div class="code"><pre><code class="clojure">keyword-to-map2
     (let [m (rq/keyword-to-map :foo.bar.baz)]
-      (is (= (:elem m) &quot;foo&quot;))
+      (is (= (:elem m) :foo))
       (is (= (:classes m) #{&quot;bar&quot; &quot;baz&quot;})))</code></pre></div><div><p>Omitting the element makes it <code>nil</code>.</p></div><div class="code"><pre><code class="clojure">keyword-to-map3
     (let [m (rq/keyword-to-map :.bar.baz)]
       (is (= (:elem m) nil))
       (is (= (:classes m) #{&quot;bar&quot; &quot;baz&quot;})))</code></pre></div><div><p>When the keyword contains a colon (<code>:</code>), the right-hand-side of the colon is taken as the <code>:attr</code> field.</p></div><div class="code"><pre><code class="clojure">keyword-to-map4
     (let [m (rq/keyword-to-map :foo:quux)]
-      (is (= (:elem m) &quot;foo&quot;))
+      (is (= (:elem m) :foo))
       (is (= (:attr m) &quot;quux&quot;)))</code></pre></div><div><span id="all-elems"></span><h3>5.2 &nbsp;&nbsp; all-elems</h3></div><div><p>The <code>all-elems</code> function takes a hiccup-like vector and returns all its sub-components that represent elements, at any nesting level.</p></div><div><p>For a simple element (with no nested elements), <code>all-elems</code> returns the element itself as a single result.</p></div><div class="code"><pre><code class="clojure">all-elems1
     (is (= (rq/all-elems [:hr]) [[:hr]]))</code></pre></div><div><p>If child elements exist, they appear in the returned sequence after the root.</p></div><div class="code"><pre><code class="clojure">all-elems2
     (let [example [:ul
