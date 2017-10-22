@@ -18,11 +18,13 @@
           (mapcat #(query-step % step) vec)
           :else
           (let [[act-elem & content] vec
+                [act-elem & act-classes] (str/split (name act-elem) #"[.]")
+                act-elem (keyword act-elem)
                 [attrs content] (cond (map? (first content))
                                       [(first content) (rest content)]
                                       :else
                                       [{} content])
-                act-classes (set (str/split (:class attrs) #" "))
+                act-classes (set (concat act-classes (str/split (:class attrs) #" ")))
                 {:keys [elem attr classes attr-vals]} step]
             (cond
               (or (nil? elem)

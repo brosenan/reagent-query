@@ -61,9 +61,9 @@
           <div class="heading">
             <div>
               <h5>Author: Boaz Rosenan</h5>
-              <h5>Date: 18 October 2017</h5>
+              <h5>Date: 22 October 2017</h5>
               <h5>Repository: <a href="https://github.com/brosenan/reagent-query">https://github.com/brosenan/reagent-query</a></h5>
-              <h5>Version: 0.2.2-SNAPSHOT</h5></div></div>
+              <h5>Version: 0.2.3</h5></div></div>
           <hr/>
           <div class="outline">
             <div class="toc">
@@ -203,7 +203,11 @@
     (is (= (rq/query [:div
                       [:a {:href &quot;foo.html&quot;}]
                       [:a {:href &quot;bar.html&quot; :class &quot;selected&quot;}]
-                      [:a {:href &quot;baz.html&quot;}]] :div :a.selected:href) [&quot;bar.html&quot;]))</code></pre></div><div><span id="attribute-values"></span><h3>2.3 &nbsp;&nbsp; Attribute Values</h3></div><div><p><code>query</code> also accepts maps instead of keywords in the path (it uses <a href='#keyword-to-map'>keyword-to-map</a> to convert everything to maps). For example, the selector <code>:a.selected:href</code> can be replaced with a map, as follows:</p></div><div class="code"><pre><code class="clojure">q-attr1
+                      [:a {:href &quot;baz.html&quot;}]] :div :a.selected:href) [&quot;bar.html&quot;]))</code></pre></div><div><p><code>reagent-query</code> identifies reagent's shorthand notation for classes, so vectors that begin with <code>:some-elem.some-class</code> are recognized as <code>:some-elem</code> with `:class "some-class".</p></div><div class="code"><pre><code class="clojure">q-cls4
+    (is (= (rq/query [:div
+                      [:a.foo {:href &quot;foo.html&quot;}]
+                      [:a.foo.selected {:href &quot;bar.html&quot;}]
+                      [:a.foo {:href &quot;baz.html&quot;}]] :div :a.selected:href) [&quot;bar.html&quot;]))</code></pre></div><div><span id="attribute-values"></span><h3>2.3 &nbsp;&nbsp; Attribute Values</h3></div><div><p><code>query</code> also accepts maps instead of keywords in the path (it uses <a href='#keyword-to-map'>keyword-to-map</a> to convert everything to maps). For example, the selector <code>:a.selected:href</code> can be replaced with a map, as follows:</p></div><div class="code"><pre><code class="clojure">q-attr1
     (is (= (rq/query [:div
                       [:a {:href &quot;foo.html&quot;}]
                       [:a {:href &quot;bar.html&quot; :class &quot;selected&quot;}]

@@ -220,6 +220,14 @@ For example, the keyword `:li.foo.bar` matches against `:li` elements that have 
                         [:a {:href "bar.html" :class "selected"}]
                         [:a {:href "baz.html"}]] :div :a.selected:href) ["bar.html"])))
 
+"`reagent-query` identifies reagent's shorthand notation for classes, so vectors that begin with `:some-elem.some-class` are recognized as `:some-elem` with
+`:class \"some-class\"."
+(fact q-cls4
+      (is (= (rq/query [:div
+                        [:a.foo {:href "foo.html"}]
+                        [:a.foo.selected {:href "bar.html"}]
+                        [:a.foo {:href "baz.html"}]] :div :a.selected:href) ["bar.html"])))
+
 [[:section {:title "Attribute Values"}]]
 "`query` also accepts maps instead of keywords in the path (it uses [keyword-to-map](#keyword-to-map) to convert everything to maps).
 For example, the selector `:a.selected:href` can be replaced with a map, as follows:"
