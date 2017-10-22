@@ -1,5 +1,6 @@
 (ns reagent-query.core
-  (:require [clojure.string :as str]))
+  (:require [clojure.string :as str]
+            [clojure.set :as set]))
 
 (defn keyword-to-map [kw]
   (let [[s attr] (str/split (name kw) #"[:]")
@@ -18,14 +19,17 @@
           (mapcat #(query-step % step) vec)
           :else
           (let [[act-elem & content] vec
-                [act-elem & act-classes] (str/split (name act-elem) #"[.]")
-                act-elem (keyword act-elem)
                 [attrs content] (cond (map? (first content))
                                       [(first content) (rest content)]
                                       :else
                                       [{} content])
-                act-classes (set (concat act-classes (str/split (:class attrs) #" ")))
-                {:keys [elem attr classes attr-vals]} step]
+                act-classes (set (str/split (:class attrs) #" "))
+                {:keys [elem attr classes attr-vals]} step
+                [act-elem act-classes] (cond (keyword? act-elem)
+                                             (let [[e & c] (str/split (name act-elem) #"[.]")]
+                                               [(keyword e) (set/union (set c) act-classes)])
+                                             :else
+                                             [act-elem act-classes])]
             (cond
               (or (nil? elem)
                   (= elem act-elem))

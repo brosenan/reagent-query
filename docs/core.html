@@ -63,7 +63,7 @@
               <h5>Author: Boaz Rosenan</h5>
               <h5>Date: 22 October 2017</h5>
               <h5>Repository: <a href="https://github.com/brosenan/reagent-query">https://github.com/brosenan/reagent-query</a></h5>
-              <h5>Version: 0.2.3</h5></div></div>
+              <h5>Version: 0.3.1</h5></div></div>
           <hr/>
           <div class="outline">
             <div class="toc">
@@ -224,7 +224,11 @@
                       [:li {:foo 1} &quot;A&quot;]
                       [:li {:foo 3 :bar 2} &quot;B&quot;]
                       [:li {:foo 1 :bar 2} &quot;C&quot;]]
-                     :ul [:li {:foo 1 :bar 2}]) [&quot;C&quot;]))</code></pre></div><div><span id="find"></span><h2><b>3 &nbsp;&nbsp; find</b></h2></div><div><p><code>find</code> is similar to <code>query</code>, only that it searches for its matches starting <i>anywhere in the hierarcy</i>, not necessarily at the given root.</p></div><div><p>For example, consider the following hiccup-like structure:</p></div><div class="code"><pre><code class="clojure">(defonce find-example
+                     :ul [:li {:foo 1 :bar 2}]) [&quot;C&quot;]))</code></pre></div><div><p>Element names are not limited to keywords. Elements can also be function names, in which case a map selector can be used to match them.</p></div><div class="code"><pre><code class="clojure">q-attr4
+    (is (= (rq/query [:div
+                      [inc 1]
+                      [dec 2]]
+                     :div {:elem inc}) [1]))</code></pre></div><div><span id="find"></span><h2><b>3 &nbsp;&nbsp; find</b></h2></div><div><p><code>find</code> is similar to <code>query</code>, only that it searches for its matches starting <i>anywhere in the hierarcy</i>, not necessarily at the given root.</p></div><div><p>For example, consider the following hiccup-like structure:</p></div><div class="code"><pre><code class="clojure">(defonce find-example
   [:div
    [:ul
     [:li {:class &quot;cart-item&quot;}

@@ -258,6 +258,14 @@ The following example is exactly the same as the previous one, only that it uses
                         [:li {:foo 1 :bar 2} "C"]]
                        :ul [:li {:foo 1 :bar 2}]) ["C"])))
 
+"Element names are not limited to keywords.
+Elements can also be function names, in which case a map selector can be used to match them."
+(fact q-attr4
+      (is (= (rq/query [:div
+                        [inc 1]
+                        [dec 2]]
+                       :div {:elem inc}) [1])))
+
 [[:chapter {:title "find"}]]
 "`find` is similar to `query`, only that it searches for its matches starting _anywhere in the hierarcy_,
 not necessarily at the given root."
