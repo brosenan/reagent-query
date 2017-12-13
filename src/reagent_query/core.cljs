@@ -57,12 +57,15 @@
       :else
       (recur (mapcat #(query-step % (first path)) res) (rest path)))))
 
-(defn mock-change-event [val]
-  (let [ctrl (js-obj)
-        ev (js-obj)]
-    (aset ctrl "value" val)
-    (aset ev "target" ctrl)
-    ev))
+(defn mock-change-event
+  ([val attr]
+   (let [ctrl (js-obj)
+         ev (js-obj)]
+     (aset ctrl attr val)
+     (aset ev "target" ctrl)
+     ev))
+  ([val]
+   (mock-change-event val "value")))
 
 (defn all-elems [root]
   (cond (vector? root) (cons root (->> (rest root)

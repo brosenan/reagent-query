@@ -297,6 +297,12 @@ which by itself is a Javascript object with one field: `value`, containing the g
       (let [ev (rq/mock-change-event "val")]
         (is (= (.-target.value ev) "val"))))
 
+"`mock-change-event` takes an optional second argument as the attribute in the target to which the value should be set.
+This is useful for input elements for which the content is mapped to attributes other than _value_."
+(fact mce2
+      (let [ev (rq/mock-change-event true "checked")]
+        (is (= (.-target.checked ev) true))))
+
 [[:chapter {:title "Under the Hood"}]]
 [[:section {:title "keyword-to-map"}]]
 "Under the hood, `reagent-query` paths consist of maps with the following optional fields:
