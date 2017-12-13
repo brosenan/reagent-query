@@ -1,4 +1,4 @@
-(defproject brosenan/reagent-query "0.3.2"
+(defproject brosenan/reagent-query "0.3.2-SNAPSHOT"
   :description "A helper library for testing Reagent code as pure functions "
   :url "https://github.com/brosenan/reagent-query"
   :license {:name "Eclipse Public License"
